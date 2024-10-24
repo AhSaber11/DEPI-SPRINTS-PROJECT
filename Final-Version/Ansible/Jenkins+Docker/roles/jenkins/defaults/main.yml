@@ -1,0 +1,71 @@
+---
+jenkins_admin_username: admin
+jenkins_admin_password: "{{ lookup('ansible.builtin.file', 'passwords.txt') }}"
+jenkins_initial_password_file: /var/lib/jenkins/secrets/initialAdminPassword
+groovy_path: /tmp/basic-security.groovy
+
+jenkins_ip: 192.168.152.60 #set EC2 IP
+jenkins_http_port: 6606
+jenkins_url: "{{ jenkins_ip }}:{{ jenkins_http_port }}"
+jenkins_home: /var/lib/jenkins
+jenkins_jar_location: /run/jenkins-cli.jar
+jenkins_url_prefix: ''
+jenkins_options: ''
+jenkins_java_options: '-Djenkins.install.runSetupWizard=false'
+
+# Plugin list can use the plugin name, or a name/version dict.
+jenkins_plugins:
+  - name: script-security
+  - name: ssh-credentials
+  - name: git
+  - name: workflow-api
+  - name: scm-api
+  - name: git-client
+  - name: github
+  - name: branch-api
+  - name: cloudbees-folder
+  - name: credentials
+  - name: workflow-multibranch
+  - name: mailer
+  - name: workflow-step-api
+  - name: matrix-project   
+  - name: github-api       
+  - name: github-pullrequest
+  - name: Docker Pipeline
+  - name: job-dsl
+
+jenkins_plugins_state: enabled
+jenkins_plugin_updates_expiration: 86400
+jenkins_plugin_timeout: 30
+jenkins_plugins_install_dependencies: true
+jenkins_updates_url: 'https://updates.jenkins.io'
+
+jenkins_init_changes:
+  - option: 'JENKINS_OPTS'
+    value: "{{ jenkins_options }}"
+  - option: 'JAVA_OPTS'
+    value: "{{ jenkins_java_options }}"
+  - option: 'JENKINS_HOME'
+    value: "{{ jenkins_home }}"
+  - option: 'JENKINS_PREFIX'
+    value: "{{ jenkins_url_prefix }}"
+  - option: 'JENKINS_PORT'
+    value: "{{ jenkins_http_port }}"
+
+
+# Define a list of credentials
+credentials:
+  - id: "github"
+    description: "GitHub Access Token"
+    username: "AbdelrahmanElbezawy"
+    password: "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"
+  - id: "nexus"
+    description: "Created by ansible for nexus"
+    username: "depi"
+    password: "test123"
+
+pipeline_name: depi
+
+jenkins_srv_file: "/usr/lib/systemd/system/jenkins.service"
+
+jenkins_restart_behavior: "safe-restart"

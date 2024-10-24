@@ -1,0 +1,83 @@
+---
+- name: Check if jenkins_srv_file exists.
+  stat:
+    path: "{{ jenkins_srv_file }}"
+  register: jenkins_srv_file_stat
+
+# If service file is not exist
+- name: Ensure jenkins_srv_file exists.
+  file:
+    path: "{{ jenkins_srv_file }}"
+    state: touch
+    mode: 0644
+  when: not jenkins_srv_file_stat.stat.exists
+
+- name: Populate jenkins_srv_file with service tag.
+  copy:
+    dest: "{{ jenkins_srv_file }}"
+    content: "[Service]"
+  when: not jenkins_srv_file_stat.stat.exists
+
+- name: Modify variables in srv file.
+  lineinfile:
+    dest: "{{ jenkins_srv_file }}"
+    insertafter: '^Environment="{{ item.option }}='
+    regexp: '^Environment="{{ item.option }} '
+    line: 'Environment="{{ item.option }}={{ item.value }}"'
+    state: present
+    mode: 0644
+  with_items: "{{ jenkins_init_changes }}"
+  register: jenkins_init_prefix
+
+- name: Ensure jenkins_home {{ jenkins_home }} exists.
+  file:
+    path: "{{ jenkins_home }}"
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: u+rwx
+    follow: true
+
+
+# Apply service changes
+- name: Restart Jenkins service
+  systemd:
+    name: jenkins
+    state: restarted
+    daemon_reload: true
+    enabled: true
+
+########################################
+########################################
+## Update Admin user Password
+#
+- name: Fetch initial Jenkins admin password
+  slurp:
+    src: /var/lib/jenkins/secrets/initialAdminPassword
+  register: intial_encodes_password
+#
+# Base64 decode a string
+- name: Decode intial_encodes_password
+  set_fact:
+    intial_password: "{{ intial_encodes_password.content | b64decode | trim }}"
+
+# Apply the script
+- name: Configure Jenkins CLI admin user and password
+  shell:  java -jar '{{ jenkins_jar_location }}' -s http://{{ jenkins_url }} -auth admin:{{ intial_password }} groovy = < {{ groovy_path }}
+  args:
+    executable: /bin/sh
+# Updating check
+- name: Confirm Jenkins user creation
+  shell: java -jar '{{ jenkins_jar_location }}' -s http://{{ jenkins_url }} -auth {{ jenkins_admin_username }}:{{ jenkins_admin_password }} who-am-i
+  args:
+    executable: /bin/sh
+  register: cmd
+# print the o/p
+- debug:
+     msg: "{{ cmd.stdout }} ,and password is {{ jenkins_admin_username }}"
+
+# Remove jar file
+- name: Remove groovy code to the remote host
+  file:
+    path: "{{ groovy_path }}"
+    state: absent

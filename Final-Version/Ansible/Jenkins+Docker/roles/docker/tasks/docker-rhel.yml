@@ -1,0 +1,50 @@
+---
+# this role is based on steps from docker documntation https://docs.docker.com/engine/install/rhel
+- name: Uninstall old versions
+  yum:
+    name: "{{ item.name }}"
+    state: absent
+  with_items: "{{ old_version }}"
+
+- name: Check if docker_path exists
+  stat:
+    path: '{{ docker_path }}'
+  register: dir_exists
+
+- name: Remove all files inside the directory
+  command: "rm -rf {{ docker_path }}"
+  when: dir_exists.stat.exists and dir_exists.stat.isdir
+
+- name: Install required packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - yum-utils
+#    - device-mapper-persistent-data
+#    - lvm2
+
+
+- name: Add Docker repository for CentOS/RedHat
+  yum_repository:
+    name: docker
+    description: Docker Repository
+    baseurl: '{{ baseurl }}'
+    enabled: 1
+    gpgcheck: 1
+    gpgkey: '{{ gpgkey }}'
+
+
+- name: Install Docker
+  yum:
+    name: "{{ item.name }}"
+    update_cache: 1
+    state: present
+  with_items: "{{ new_version }}"
+
+
+- name: Ensure Docker service is started and enabled
+  service:
+    name: docker
+    state: started
+    enabled: 1

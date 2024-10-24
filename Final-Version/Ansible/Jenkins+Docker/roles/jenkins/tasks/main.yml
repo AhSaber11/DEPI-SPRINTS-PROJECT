@@ -1,0 +1,17 @@
+---
+# Setup/install tasks.
+- name: Install on rhel based distros
+  include_tasks: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+  
+- name: Configure Jenkins settings.
+  include_tasks: settings.yml
+
+- name: Install required plugins.
+  include_tasks: plugins.yml
+
+- name: Configure required credentials.
+  include_tasks: credentials.yml
+
+- name: Create Piepline.
+  include_tasks: pipeline.yml
