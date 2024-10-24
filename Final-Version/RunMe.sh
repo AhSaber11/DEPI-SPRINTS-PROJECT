@@ -12,4 +12,4 @@ echo "Ansible is starting now, wait"
 cd ../Ansible/Jenkins+Docker
 ansible-playbook  RunMe.yml 
 
-echo "$ip"
+#echo "$ip"
