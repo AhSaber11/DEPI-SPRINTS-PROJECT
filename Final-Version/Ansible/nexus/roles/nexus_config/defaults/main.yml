@@ -1,0 +1,75 @@
+---
+
+# Administrator user name
+admin_username: admin
+
+# Initial Nexus admin password
+initial_admin_password: admin123
+
+# Admin password which will be set during the initial setup.
+admin_password: "{{ lookup('ansible.builtin.file', 'ADMIN_PASSWORD') }}" # "{{ lookup('env', 'ADMIN_PASSWORD') }}"
+
+# Nexus API host
+api_host: 192.168.152.45
+
+# Nexus API port
+api_port: 32000
+
+# Nexus endpoint protocol
+api_protocol: http
+
+# Path to root ca .pem file, if https with custom ssl is used
+root_ca:
+
+# Hide sensitive Ansible error logs (may contain passwords)
+hide_sensitive_logs: false
+
+# Anonymous access
+anonymous_access: true
+
+blob_store: depi-nexus
+
+users: 
+   - id: depi                    # User ID
+     first_name: de            # User's first name
+     last_name: pi              # User's last name
+     email: jdepi@project.cc     # Email
+     password: test123          # Password ( do not push it to git :) )
+     status: active              # Status of the user. You can set active/disabled or deleted to delete the user.
+     source: default                   # Source
+     roles:                      # List of the assigned roles
+       - nx-role 
+
+
+roles: 
+    - id: nx-role                         # Role ID
+      name: nx-role                       # Role name
+      description: Some new role          # Role description
+      status: created                     # Status of the role. You can set created or deleted to delete the role.
+      privileges:                         # Privileges to include
+        - nx-repository-view-docker-*-*
+      roles: [ ]                          # Roles to include
+
+stores:
+  - name: depi-nexus            # Blob Store name
+    type: file                  # Blob Store type (file, s3)
+    soft_quota: 3               # Blob Store quota
+    path: /nexus-data/{{ blob_store }}/
+    status: active              # Blob Store status (active, deleted)
+
+
+repositories: 
+  -  name: docker-hosted
+     type: docker                                    # Repository type (Currently supported: maven)
+     kind: hosted   
+     online: true                                  # Repository state (true, false, deleted)
+     blob_store: "{{ blob_store }}"                           # Blob storeage
+     strict_content_type_validation: true         # Strict Content Type Validation
+     write_policy: allow                           # Controls if deployments of and updates to assets are allowed (allow, allow_once, deny)
+     cleanup_names: []                             # Cleanup policies names. Omit if no cleanup is needed.
+     version_policy: MIXED                         # Version Policy (MIXED, RELEASE, SNAPSHOT)
+     layout_policy: STRICT                         # Layout Policy (STRICT, PERMISSIVE)
+     content: INLINE   
+     v1_enabled: true                                  # Repository kind (hosted, proxy)
+     force_basic_auth: true                       # Whether to force authentication (Docker Bearer Token Realm required if false)
+     httpPort: 31100 # <- 31200  #     httpsPort: null 

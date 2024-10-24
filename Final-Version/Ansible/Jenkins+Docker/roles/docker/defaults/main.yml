@@ -1,0 +1,21 @@
+---
+# Plugin list can use the plugin name, or a name/version dict.
+old_version:
+  - name: docker-client
+  - name: docker-client-latest
+  - name: docker-common
+  - name: docker-latest
+  - name: docker-latest-logrotate
+  - name: docker-logrotate
+  - name: docker-engine
+  - name: podman
+  - name: runc
+
+
+docker_path:  /var/lib/docker/
+baseurl: https://download.docker.com/linux/rhel/$releasever/$basearch/stable
+gpgkey: https://download.docker.com/linux/rhel/gpg
+new_version:
+  - name: docker-ce
+  - name: docker-ce-cli
+  - name: containerd.io

@@ -1,0 +1,34 @@
+---
+- name: Ensure Python is installed
+  package:
+    name: python3
+    state: present
+- name: Ensure pip is installed
+  package:
+    name: python3-pip
+    state: present
+- name: Install python-jenkins
+  pip:
+    name: python-jenkins
+    state: present 
+
+- name: restart jenkins
+  include_tasks: tasks/restart.yml
+
+- name: Create pipeline job
+  community.general.jenkins_job:
+    user: "{{ jenkins_admin_username }}"
+    password: "{{ jenkins_admin_password }}"
+    url: "http://{{ jenkins_url }}" 
+    name: "{{ pipeline_name }}"
+    state: "present"
+    config: "{{ lookup('file', 'templates/create pipeline.xml.j2') }}"
+
+
+- name: Create a jenkins build using basic authentication
+  community.general.jenkins_build:
+    name: "{{ pipeline_name }}"
+    state: present
+    user: "{{ jenkins_admin_username }}"
+    password: "{{ jenkins_admin_password }}"
+    url: http://{{ jenkins_url }}

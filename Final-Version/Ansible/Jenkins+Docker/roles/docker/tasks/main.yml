@@ -1,0 +1,13 @@
+---
+# Setup/install tasks.
+- name: Install on rhel based distros
+  include_tasks: docker-rhel.yml
+  when: ansible_os_family == 'RedHat' and ansible_distribution != "Amazon" 
+
+- name: Install on debian based distros
+  include_tasks: docker-debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Install on aws distros
+  include_tasks: docker-aws.yml
+  when: ansible_distribution == "Amazon" 

@@ -1,0 +1,9 @@
+---
+- name: Configure Nexus
+  hosts: rocky
+  #user: sysops
+  become: yes
+  vars:
+# All Variable are defined in roles/defaults file
+  roles:
+    - role: nexus_config

@@ -1,0 +1,7 @@
+- hosts: aws  # [Jenkins]
+#  vars_files:
+#    - inventory/group_vars/Jenkins.yml
+  become: true
+  roles:
+     #   - docker
+        - jenkins

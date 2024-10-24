@@ -1,0 +1,64 @@
+---
+- name: Uninstall old versions
+  yum:
+    name: "{{ item.name }}"
+    state: absent
+  with_items: "{{ old_version }}"
+
+
+- name: Install required packages
+  dnf:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - ca-certificates
+
+- name: Update all packages
+  yum:
+    name: '*'
+    state: latest
+    update_only: yes
+
+- name: Check if docker_path exists
+  stat:
+    path: '{{ docker_path }}'
+  register: dir_exists
+
+- name: Remove all files inside the directory
+  command: "rm -rf {{ docker_path }}"
+  when: dir_exists.stat.exists and dir_exists.stat.isdir
+
+
+- name: Ensure a list of yum packages are installed
+  dnf:
+    name: "{{ packages }}"
+    state: latest
+    update_cache: yes
+  vars:
+    packages:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+
+- name: Install Docker
+  dnf:
+    name: docker
+    update_cache: 1
+    state: present
+
+
+
+- name: Enable Docker CE service at startup
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+####- name: Ensure Python pip packages are installed
+####  pip:
+####    name: "{{ packages }}"
+####  vars:
+####    packages:
+####    - boto
+####    - boto3
+####    - docker-compose

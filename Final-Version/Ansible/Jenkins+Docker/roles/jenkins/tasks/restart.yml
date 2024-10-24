@@ -1,0 +1,23 @@
+---
+- name: restart jenkins via service
+  service: name=jenkins state=restarted
+  when: jenkins_restart_behavior == 'service'
+
+- name: Download Jenkins CLI jar
+  get_url:
+    url: 'http://{{ jenkins_url }}/jnlpJars/jenkins-cli.jar'
+    dest: '{{ jenkins_jar_location }}'
+  when: jenkins_restart_behavior == 'safe-restart'
+
+- name: safe-restart jenkins via CLI
+  ansible.builtin.command: java -jar {{ jenkins_jar_location }} -auth {{ jenkins_admin_username }}:{{ jenkins_admin_password }} -s http://{{ jenkins_url }} safe-restart
+  when: jenkins_restart_behavior == 'safe-restart'
+
+- name: Remove groovy code to the remote host
+  file:
+    path: "{{ groovy_path }}"
+    state: absent
+
+- name: Pause for 1 minutes to restart
+  ansible.builtin.pause:
+    minutes: 1
