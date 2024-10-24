@@ -36,7 +36,6 @@ How to Run This Project
 
 Clone the repository:
 
-
 git clone https://github.com/AhSaber11/DEPI-SPRINTS-PROJECT.git
 
 Install Terraform and Ansible.
