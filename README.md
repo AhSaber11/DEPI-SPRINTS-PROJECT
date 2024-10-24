@@ -18,6 +18,7 @@ Created an EKS cluster with two nodes using Terraform.
 Set up an EC2 instance to host Jenkins.
 Configured AWS networking and security groups.
 Set up CloudWatch alarms to monitor EC2 and EKS resources.
+
 Jenkins Configuration:
 
 Installed Jenkins on EC2 using Ansible.
@@ -32,6 +33,7 @@ Kubernetes Deployment:
 Deployed applications using Kubernetes manifests, Helm charts, and Ingress via NGINX.
 Monitored and managed the deployment lifecycle using Jenkins pipelines.
 How to Run This Project
+
 Clone the repository:
 
 git clone https://github.com/AhSaber11/DEPI-SPRINTS-PROJECT.git
