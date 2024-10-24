@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd terraform 
+cd ../terraform 
 echo "applying terraform"
 ip=$(terraform apply -auto-approve | grep "web_instance_ip" | grep -Eo '[0-9]{1,4}.[0-9]{1,4}.[0-9]{1,4}.[0-9]{1,4}')
 
